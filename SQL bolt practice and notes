@@ -84,11 +84,140 @@ ORDER BY column, … ASC/DESC
 LIMIT num_limit OFFSET num_offset;
 
 
+Find the domestic and international sales for each movie 
+
+SELECT Title,domestic_sales,international_sales FROM movies
+Inner Join boxoffice 
+ON Id = Movie_Id;
+
+
+
+Select query with LEFT/RIGHT/FULL JOINs on multiple tables
+SELECT column, another_column, …
+FROM mytable
+INNER/LEFT/RIGHT/FULL JOIN another_table 
+    ON mytable.id = another_table.matching_id
+WHERE condition(s)
+ORDER BY column, … ASC/DESC
+LIMIT num_limit OFFSET num_offset;
+
+Table: buildings (Read-only)
+building_name	capacity
+1e	24
+1w	32
+2e	16
+2w	20
+
+
+
+Table: buildings (Read-only)
+building_name	capacity
+1e	24
+1w	32
+2e	16
+2w	20
+
+Table: employees (Read-only)
+role	name	building	years_employed
+Engineer	Becky A.	1e	4
+Engineer	Dan B.	1e	2
+Engineer	Sharon F.	1e	6
+Engineer	Dan M.	1e	4
+Engineer	Malcom S.	1e	1
+Artist	Tylar S.	2w	2
+Artist	Sherman D.	2w	8
+Artist	Jakob J.	2w	6
+Artist	Lillia A.	2w	7
+Artist	Brandon J.	2w	7
+Manager	Scott K.	1e	9
+Manager	Shirlee M.	1e	3
+Manager	Daria O.	2w	6
+
+Find the list of all buildings that have employees 
+SELECT Distinct building FROM Employees
+Left Join Buildings on Employees.Building = Buildings.Building_name;
+building
+1e
+2w
+
+
+Find the list of all buildings and their capacity 
+SELECT Distinct building_name,capacity FROM Buildings
+Left Join Employees on Buildings.Building_name = Employees.Building;
+building_name	capacity
+1e	24
+1w	32
+2e	16
+2w	20
+
+
+List all buildings and the distinct employee roles in each building (including empty buildings)
+SELECT Distinct Role, Building_name FROM Buildings
+LEFT JOIN Employees 
+   ON Buildings.Building_name = Employees.Building;
+
+
+role	building_name
+Engineer	1e
+Manager	1e
+1w
+2e
+Artist	2w
+Manager	2w
+
+KEY TO LEFT JOINS IS WHICH COLUMN DO WE WANT TO KEEP ALL OF THE DATA? THAT IS THE PRIMARY TABLE WE DRAW FROM (LEFT TABLE). 
+(What should every row in my final row represent?)(If it's about buildings, start w buildings, if it's about employees start w employees)
+LEFT JOIN RIGHT TABLE WITH DATA YOU WOULD NOT CARE TO KEEP
+
+
+If you only need matching records use an inner join
+If you have 1 table as a primary source and want to add into that, use a left join
+If you need every record from both tables use a FULL JOIN
+
+Select query with constraints on NULL values
+SELECT column, another_column, …
+FROM mytable
+WHERE column IS/IS NOT NULL
+AND/OR another_condition
+AND/OR …;
+
+Find the name and role of all employees who have not been assigned to a building 
+SELECT Name,Role,building FROM employees
+Left Join Buildings On Employees.building = Buildings.Building_name
+Where Building is NUll;
+
+
+Find the names of the buildings that hold no employees
+SELECT Building_name,Role FROM Buildings
+Left Join Employees On Employees.building = Buildings.Building_name
+Where Role is NUll;
 
 
 
 
 
+Example query with expressions
+SELECT particle_speed / 2.0 AS half_particle_speed
+FROM physics_data
+WHERE ABS(particle_position) * 10.0 > 500;
+
+
+Select query with expression aliases
+SELECT col_expression AS expr_description, …
+FROM mytable;
+
+Example query with both column and table name aliases
+SELECT column AS better_column_name, …
+FROM a_long_widgets_table_name AS mywidgets
+INNER JOIN widget_sales
+  ON mywidgets.id = widget_sales.widget_id;
 
 
 
+
+List all movies and their combined sales in millions of dollars 
+SELECT Title, id, (domestic_sales + International_sales) / 1000000 FROM movies
+* /1000000 converts into millions, easier to read
+
+Inner Join Boxoffice on Movies.ID = Boxoffice.Movie_id
+Where domestic_sales + International_sales > 1000000;
