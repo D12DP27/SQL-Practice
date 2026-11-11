@@ -221,3 +221,243 @@ SELECT Title, id, (domestic_sales + International_sales) / 1000000 FROM movies
 
 Inner Join Boxoffice on Movies.ID = Boxoffice.Movie_id
 Where domestic_sales + International_sales > 1000000;
+
+
+List all movies and their ratings in percent
+SELECT Title, id, rating * 10 as percent_of_rating FROM movies
+Inner Join Boxoffice on Movies.ID = Boxoffice.Movie_id;
+
+List all movies that were released on even number years
+SELECT Title, id, year FROM movies
+Inner Join Boxoffice on Movies.ID = Boxoffice.Movie_id
+WHERE Year % 2 = 0 ;
+% 2 is dividing thew entire column by 2 and =0 is remainder of 0
+
+
+
+
+
+
+Select query with aggregate functions over all rows
+SELECT AGG_FUNC(column_or_expression) AS aggregate_description, …
+FROM mytable
+WHERE constraint_expression;
+
+
+Here are some common aggregate functions that we are going to use in our examples:
+
+Function	Description
+COUNT(*),   COUNT(column)	A common function used to counts the number of rows in the group if no column name is specified. Otherwise, count the number of rows in the group with non-NULL values in the specified column.
+MIN(column)	Finds the smallest numerical value in the specified column for all rows in the group.
+MAX(column)	Finds the largest numerical value in the specified column for all rows in the group.
+AVG(column)	Finds the average numerical value in the specified column for all rows in the group.
+SUM(column)	Finds the sum of all numerical values in the specified column for the rows in the group.
+
+
+Select query with aggregate functions over groups
+SELECT AGG_FUNC(column_or_expression) AS aggregate_description, …
+FROM mytable
+WHERE constraint_expression
+GROUP BY column;
+
+The GROUP BY clause works by grouping rows that have the same value in the column specified.
+
+
+
+Find the longest time that an employee has been at the studio ✓
+SELECT MAX(Years_Employed) FROM employees;
+
+
+For each role, find the average number of years employed by employees in that role
+SELECT  DISTINCT Role, AVG(Years_Employed)  FROM employees
+GROUP By (Role) ;
+
+
+Find the total number of employee years worked in each building
+SELECT Role, SUM(Years_Employed), Name, building  FROM employees
+GROUP By (building) ;
+
+
+
+
+How exactly do we filter the grouped rows?
+Luckily, SQL allows us to do this by adding an additional HAVING clause which is used specifically with the GROUP BY clause to allow us to filter grouped rows from the result set.
+
+Select query with HAVING constraint
+SELECT group_by_column, AGG_FUNC(column_expression) AS aggregate_result_alias, …
+FROM mytable
+WHERE condition
+GROUP BY column
+HAVING group_condition;
+
+Did you know?
+If you aren't using the `GROUP BY` clause, a simple `WHERE` clause will suffice.
+
+
+Find the number of Artists in the studio (without a HAVING clause) 
+SELECT Count(role) FROM employees 
+WHERE Role like 'Artist' ;
+
+Find the number of Employees of each role in the studio 
+SELECT Role,Count(Role) FROM employees 
+Group By (Role) ;
+
+Find the total number of years employed by all Engineers 
+SELECT Role,SUM(Years_Employed) FROM employees 
+GROUP BY (Role)
+Having Role like 'Engineer';
+
+
+
+
+
+
+
+
+Order of execution of a Query
+Complete SELECT query
+
+SELECT DISTINCT column, AGG_FUNC(column_or_expression), …
+FROM mytable
+    JOIN another_table
+      ON mytable.column = another_table.column
+    WHERE constraint_expression
+    GROUP BY column
+    HAVING constraint_expression
+    ORDER BY column ASC/DESC
+    LIMIT count OFFSET COUNT;
+
+
+Find the number of movies each director has directed
+SELECT COUNT(TITLE),Director FROM movies
+Group By (Director);
+
+
+Find the total domestic and international sales that can be attributed to each director
+SELECT TITLE,Director,SUM(domestic_sales+international_sales)as Total_Sales FROM Boxoffice
+Left Join Movies On Boxoffice.movie_id = Movies.Id
+Group by (director);
+
+
+
+
+
+
+
+
+
+What is a Schema?
+We previously described a table in a database as a two-dimensional set of rows and columns, 
+with the columns being the properties and the rows being instances of the entity in the table. 
+In SQL, the database schema is what describes the structure of each table, 
+and the datatypes that each column of the table can contain.
+
+When inserting data into a database, we need to use an INSERT statement, which declares which table to write into, the columns of data that we are filling, 
+and one or more rows of data to insert. In general, each row of data you insert should contain values for every corresponding column in the table. 
+You can insert multiple rows at a time by just listing them sequentially.
+
+Insert statement with values for all columns
+INSERT INTO mytable
+VALUES (value_or_expr, another_value_or_expr, …),
+       (value_or_expr_2, another_value_or_expr_2, …),
+       …;
+Insert statement with specific columns
+INSERT INTO mytable
+(column, another_column, …)
+VALUES (value_or_expr, another_value_or_expr, …),
+      (value_or_expr_2, another_value_or_expr_2, …),
+      …;
+
+
+Example Insert statement with expressions
+INSERT INTO boxoffice
+(movie_id, rating, sales_in_millions)
+VALUES (1, 9.9, 283742034 / 1000000);
+
+
+
+Add the studio's new production, Toy Story 4 to the list of movies (you can use any director) 
+INSERT INTO movies 
+VALUES (4, "Toy Story 4", "John Lasseter", 2015, 90);
+
+Toy Story 4 has been released to critical acclaim! It had a rating of 8.7, 
+and made 340 million domestically and 270 million internationally. Add the record to the BoxOffice table. ✓
+
+INSERT INTO Boxoffice 
+VALUES (4, 8.7, 340000, 270000);
+
+
+Update statement with values
+UPDATE mytable
+SET column = value_or_expr, 
+    other_column = another_value_or_expr, 
+    …
+WHERE condition;
+
+The director for A Bug's Life is incorrect, it was actually directed by John Lasseter
+UPDATE movies
+SET Director = 'John Lasseter'
+Where Title like "A Bug's Life";
+
+
+
+Both the title and director for Toy Story 8 is incorrect! The title should be "Toy Story 3" and it was directed by Lee Unkrich
+UPDATE movies
+SET Title = "Toy Story 3",
+    Director = "Lee Unkrich"
+Where Id = 11;
+
+
+
+
+
+
+
+Delete statement with condition
+DELETE FROM mytable
+WHERE condition;
+
+This database is getting too big, lets remove all movies that were released before 2005.
+DELETE FROM Movies
+WHERE Year < 2005;
+
+Andrew Stanton has also left the studio, so please remove all movies directed by him.
+DELETE FROM Movies
+WHERE Director like 'Andrew Stanton';
+
+
+
+
+
+
+
+
+
+
+
+
+SQL Lesson 16: Creating tables
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
